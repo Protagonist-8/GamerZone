@@ -56,17 +56,17 @@ export default function AuthModal({ onClose }: AuthModalProps) {
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-xl border border-white/10 bg-[#0d111c] p-6 text-white"
+        className="w-full max-w-md rounded-xl border border-white/10 bg-[#13131f] p-6 text-white"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold">
+          <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold">
             {mode === "signin" ? "Sign In" : "Create Account"}
           </h2>
 
           <button
             onClick={onClose}
-            className="text-xl text-gray-400 hover:text-white"
+            className="cursor-pointer text-xl text-[#8a8aa3] hover:text-white"
           >
             ×
           </button>
@@ -74,7 +74,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-2 block text-sm text-gray-300">
+            <label className="mb-2 block text-sm text-[#b5b5c9]">
               Email
             </label>
 
@@ -83,13 +83,13 @@ export default function AuthModal({ onClose }: AuthModalProps) {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-[#101522] px-4 py-3 outline-none focus:border-blue-500"
+              className="w-full rounded-lg border border-white/10 bg-[#161625] px-4 py-3 outline-none transition-colors focus:border-[#7c5cff]"
               placeholder="you@example.com"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm text-gray-300">
+            <label className="mb-2 block text-sm text-[#b5b5c9]">
               Password
             </label>
 
@@ -99,21 +99,19 @@ export default function AuthModal({ onClose }: AuthModalProps) {
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-[#101522] px-4 py-3 outline-none focus:border-blue-500"
+              className="w-full rounded-lg border border-white/10 bg-[#161625] px-4 py-3 outline-none transition-colors focus:border-[#7c5cff]"
               placeholder="••••••••"
             />
           </div>
 
           {message && (
-            <p className="text-sm text-gray-300">
-              {message}
-            </p>
+            <p className="text-sm text-[#b5b5c9]">{message}</p>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-blue-500 px-4 py-3 font-semibold text-white hover:bg-blue-600 disabled:opacity-50"
+            className="w-full cursor-pointer rounded-lg bg-[#7c5cff] px-4 py-3 font-semibold text-white transition-colors hover:bg-[#6a45ff] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading
               ? "Please wait..."
@@ -123,16 +121,16 @@ export default function AuthModal({ onClose }: AuthModalProps) {
           </button>
         </form>
 
-        <div className="mt-5 text-center text-sm text-gray-400">
+        <div className="mt-5 text-center text-sm text-[#8a8aa3]">
           {mode === "signin" ? (
             <>
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <button
                 onClick={() => {
                   setMode("signup");
                   setMessage("");
                 }}
-                className="text-blue-400 hover:text-blue-300"
+                className="cursor-pointer text-[#9b8cff] hover:text-[#c4b5ff]"
               >
                 Sign Up
               </button>
@@ -145,7 +143,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
                   setMode("signin");
                   setMessage("");
                 }}
-                className="text-blue-400 hover:text-blue-300"
+                className="cursor-pointer text-[#9b8cff] hover:text-[#c4b5ff]"
               >
                 Sign In
               </button>

@@ -146,35 +146,35 @@ export default function LibraryPage() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#05070d] text-white">
-        <p className="text-gray-400">Loading your library...</p>
+      <main className="flex min-h-screen items-center justify-center bg-[#0a0a14] text-white">
+        <p className="text-[#8a8aa3]">Loading your library...</p>
       </main>
     );
   }
 
   if (!signedIn) {
     return (
-      <main className="min-h-screen bg-[#05070d] px-6 py-12 text-white">
+      <main className="min-h-screen bg-[#0a0a14] px-6 py-12 text-white">
         <div className="mx-auto max-w-5xl">
           <Link
             href="/"
-            className="text-sm text-blue-400 hover:text-blue-300"
+            className="text-sm text-[#9b8cff] hover:text-[#c4b5ff]"
           >
             ← Back to Games
           </Link>
 
-          <div className="mt-12 rounded-xl border border-white/10 bg-[#0d111c] p-10 text-center">
-            <h1 className="text-3xl font-bold">
+          <div className="mt-12 rounded-xl border border-white/10 bg-[#13131f] p-10 text-center">
+            <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold">
               Sign in to view your library
             </h1>
 
-            <p className="mt-3 text-gray-400">
+            <p className="mt-3 text-[#8a8aa3]">
               Your purchased games will appear here.
             </p>
 
             <Link
               href="/"
-              className="mt-6 inline-block rounded-lg bg-blue-600 px-6 py-3 font-semibold hover:bg-blue-500"
+              className="mt-6 inline-block cursor-pointer rounded-lg bg-[#7c5cff] px-6 py-3 font-semibold transition-colors hover:bg-[#6a45ff]"
             >
               Go to Games
             </Link>
@@ -186,48 +186,45 @@ export default function LibraryPage() {
 
   if (error) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#05070d] text-white">
+      <main className="flex min-h-screen items-center justify-center bg-[#0a0a14] text-white">
         <p className="text-red-400">{error}</p>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#05070d] px-6 py-12 text-white">
+    <main className="min-h-screen bg-[#0a0a14] px-6 py-12 text-white">
       <div className="mx-auto max-w-7xl">
-
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold">
+            <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold">
               My Library
             </h1>
 
-            <p className="mt-2 text-gray-400">
-              Your purchased games
-            </p>
+            <p className="mt-2 text-[#8a8aa3]">Your purchased games</p>
           </div>
 
           <Link
             href="/"
-            className="text-sm text-blue-400 hover:text-blue-300"
+            className="text-sm text-[#9b8cff] hover:text-[#c4b5ff]"
           >
             ← Continue Shopping
           </Link>
         </div>
 
         {items.length === 0 ? (
-          <div className="mt-12 rounded-xl border border-white/10 bg-[#0d111c] p-10 text-center">
+          <div className="mt-12 rounded-xl border border-white/10 bg-[#13131f] p-10 text-center">
             <h2 className="text-2xl font-semibold">
               Your library is empty
             </h2>
 
-            <p className="mt-3 text-gray-400">
+            <p className="mt-3 text-[#8a8aa3]">
               Purchase a game and it will appear here.
             </p>
 
             <Link
               href="/"
-              className="mt-6 inline-block rounded-lg bg-blue-600 px-6 py-3 font-semibold hover:bg-blue-500"
+              className="mt-6 inline-block cursor-pointer rounded-lg bg-[#7c5cff] px-6 py-3 font-semibold transition-colors hover:bg-[#6a45ff]"
             >
               Browse Games
             </Link>
@@ -238,7 +235,7 @@ export default function LibraryPage() {
               <Link
                 key={`${item.game.game_id}-${item.console?.console_id}-${index}`}
                 href={`/games/${item.game.game_id}`}
-                className="group overflow-hidden rounded-lg bg-[#0d111c] transition hover:-translate-y-1 hover:bg-[#141a29]"
+                className="group overflow-hidden rounded-lg border border-white/5 bg-[#13131f] transition-all duration-200 hover:-translate-y-1 hover:border-[#7c5cff]/40 hover:bg-[#191928]"
               >
                 <div className="aspect-[3/4] overflow-hidden">
                   {item.game.image_url ? (
@@ -248,7 +245,7 @@ export default function LibraryPage() {
                       className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-[#151b2a] text-sm text-gray-500">
+                    <div className="flex h-full w-full items-center justify-center bg-[#1a1a2c] text-sm text-[#6b6b85]">
                       No Image
                     </div>
                   )}
@@ -259,7 +256,7 @@ export default function LibraryPage() {
                     {item.game.game_name}
                   </h2>
 
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-[#6b6b85]">
                     {item.game.release_year ?? "Unknown"}
                     {" • "}
                     {item.console?.abbreviation ||
@@ -267,7 +264,7 @@ export default function LibraryPage() {
                       "Unknown"}
                   </p>
 
-                  <p className="mt-3 text-sm font-semibold text-green-400">
+                  <p className="mt-3 text-sm font-semibold text-[#34e6c8]">
                     Purchased
                   </p>
                 </div>

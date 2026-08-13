@@ -60,7 +60,7 @@ export default function HeaderAuth() {
 
             <button
               onClick={handleSignOut}
-              className="rounded-full border border-white/20 px-5 py-2 text-sm hover:bg-white/10"
+              className="cursor-pointer rounded-full border border-white/20 px-5 py-2 text-sm transition-colors hover:border-[#7c5cff]/50 hover:bg-white/10"
             >
               Sign Out
             </button>
@@ -68,7 +68,7 @@ export default function HeaderAuth() {
         ) : (
           <button
             onClick={() => setShowAuth(true)}
-            className="rounded-full border border-white/20 px-5 py-2 text-sm hover:bg-white/10"
+            className="cursor-pointer rounded-full border border-white/20 px-5 py-2 text-sm transition-colors hover:border-[#7c5cff]/50 hover:bg-white/10"
           >
             Sign In
           </button>

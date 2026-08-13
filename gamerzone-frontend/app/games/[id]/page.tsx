@@ -98,12 +98,12 @@ export default async function GameDetails({
     }) || [];
 
   return (
-    <main className="min-h-screen bg-[#05070d] text-white">
-      <header className="border-b border-white/10 bg-[#080b14]">
+    <main className="min-h-screen bg-[#0a0a14] text-white">
+      <header className="border-b border-white/10 bg-[#0d0d1a]">
         <div className="mx-auto max-w-7xl px-6 py-5">
           <Link
             href="/"
-            className="text-2xl font-bold text-blue-400"
+            className="font-[family-name:var(--font-display)] text-2xl font-bold text-[#9b8cff]"
           >
             GAMER<span className="text-white">ZONE</span>
           </Link>
@@ -119,22 +119,22 @@ export default async function GameDetails({
               className="w-full rounded-xl object-cover"
             />
           ) : (
-            <div className="flex aspect-[3/4] w-full items-center justify-center rounded-xl bg-[#151b2a] text-gray-500">
+            <div className="flex aspect-[3/4] w-full items-center justify-center rounded-xl bg-[#1a1a2c] text-[#8a8aa3]">
               No Image
             </div>
           )}
         </div>
 
         <div className="flex flex-col justify-center">
-          <h1 className="text-4xl font-bold md:text-5xl">
+          <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold md:text-5xl">
             {typedGame.game_name}
           </h1>
 
-          <p className="mt-3 text-gray-400">
+          <p className="mt-3 text-[#8a8aa3]">
             Released {typedGame.release_year ?? "Unknown"}
           </p>
 
-          <p className="mt-8 leading-7 text-gray-300">
+          <p className="mt-8 leading-7 text-[#b5b5c9]">
             {typedGame.description || "No description available."}
           </p>
 
@@ -146,7 +146,7 @@ export default async function GameDetails({
 
           <Link
             href="/"
-            className="mt-6 w-fit text-sm text-gray-400 hover:text-white"
+            className="mt-6 w-fit text-sm text-[#8a8aa3] transition-colors hover:text-white"
           >
             ← Back to Games
           </Link>

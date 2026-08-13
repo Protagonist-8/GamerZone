@@ -10,6 +10,7 @@ export type CartItem = {
   gameId: number;
   gameName: string;
   consoleId: number;
+  consoleName: string;
   price: number;
 };
 

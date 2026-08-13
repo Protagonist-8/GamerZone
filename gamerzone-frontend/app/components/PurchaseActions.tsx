@@ -63,6 +63,7 @@ export default function PurchaseActions({
       gameId,
       gameName,
       consoleId: selectedPlatform.consoleId,
+      consoleName: selectedPlatform.name,
       price: selectedPrice,
     });
 
@@ -85,6 +86,7 @@ export default function PurchaseActions({
       gameId,
       gameName,
       consoleId: selectedPlatform.consoleId,
+      consoleName: selectedPlatform.name,
       price: selectedPrice,
     });
 
@@ -94,7 +96,7 @@ export default function PurchaseActions({
   return (
     <>
       <div className="mt-8">
-        <p className="mb-4 text-sm uppercase tracking-widest text-blue-400">
+        <p className="mb-4 text-sm uppercase tracking-widest text-[#34e6c8]">
           Choose Platform
         </p>
 
@@ -111,21 +113,19 @@ export default function PurchaseActions({
                   setSelectedConsoleId(platform.consoleId)
                 }
                 disabled={platform.price === null}
-                className={`flex w-full items-center justify-between rounded-lg border px-5 py-4 text-left transition ${
+                className={`flex w-full items-center justify-between rounded-lg border px-5 py-4 text-left transition-colors ${
                   isSelected
-                    ? "border-blue-500 bg-blue-500/10"
-                    : "border-white/10 bg-[#0d111c] hover:border-white/30"
+                    ? "border-[#7c5cff] bg-[#7c5cff]/10"
+                    : "border-white/10 bg-[#13131f] hover:border-white/30"
                 } ${
                   platform.price === null
                     ? "cursor-not-allowed opacity-50"
-                    : ""
+                    : "cursor-pointer"
                 }`}
               >
-                <span className="font-medium">
-                  {platform.name}
-                </span>
+                <span className="font-medium">{platform.name}</span>
 
-                <span className="font-semibold text-blue-400">
+                <span className="font-semibold text-[#34e6c8]">
                   {platform.price !== null
                     ? `₹${platform.price}`
                     : "Price unavailable"}
@@ -140,7 +140,7 @@ export default function PurchaseActions({
         <button
           onClick={handleBuyNow}
           disabled={selectedPrice === null}
-          className="rounded-lg bg-blue-600 px-8 py-3 font-semibold hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+          className="cursor-pointer rounded-lg bg-[#7c5cff] px-8 py-3 font-semibold transition-colors hover:bg-[#6a45ff] disabled:cursor-not-allowed disabled:opacity-50"
         >
           Buy Now
         </button>
@@ -148,7 +148,7 @@ export default function PurchaseActions({
         <button
           onClick={handleAddToCart}
           disabled={selectedPrice === null}
-          className="rounded-lg border border-white/20 px-8 py-3 font-semibold hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
+          className="cursor-pointer rounded-lg border border-white/20 px-8 py-3 font-semibold transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Add to Cart
         </button>
@@ -156,22 +156,18 @@ export default function PurchaseActions({
 
       {message && (
         <div className="mt-4 flex items-center gap-4">
-          <p className="text-sm text-green-400">
-            {message}
-          </p>
+          <p className="text-sm text-[#34e6c8]">{message}</p>
 
           <button
             onClick={() => router.push("/cart")}
-            className="text-sm font-medium text-blue-400 hover:text-blue-300"
+            className="cursor-pointer text-sm font-medium text-[#9b8cff] hover:text-[#c4b5ff]"
           >
             View Cart →
           </button>
         </div>
       )}
 
-      {showAuth && (
-        <AuthModal onClose={() => setShowAuth(false)} />
-      )}
+      {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
     </>
   );
 }

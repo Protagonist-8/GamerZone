@@ -194,31 +194,31 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#05070d] px-6 py-12 text-white">
+    <main className="min-h-screen bg-[#0a0a14] px-6 py-12 text-white">
       <div className="mx-auto max-w-6xl">
 
         <div className="flex items-center justify-between">
-          <h1 className="text-4xl font-bold">
+          <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold">
             Checkout
           </h1>
 
           <Link
             href="/cart"
-            className="text-sm text-blue-400 hover:text-blue-300"
+            className="text-sm text-[#9b8cff] hover:text-[#c4b5ff]"
           >
             ← Back to Cart
           </Link>
         </div>
 
         {items.length === 0 ? (
-          <div className="mt-12 rounded-xl border border-white/10 bg-[#0d111c] p-10 text-center">
-            <p className="text-gray-400">
+          <div className="mt-12 rounded-xl border border-white/10 bg-[#13131f] p-10 text-center">
+            <p className="text-[#8a8aa3]">
               Your cart is empty.
             </p>
 
             <Link
               href="/"
-              className="mt-6 inline-block rounded-lg bg-blue-600 px-6 py-3 font-semibold hover:bg-blue-500"
+              className="mt-6 inline-block cursor-pointer rounded-lg bg-[#7c5cff] px-6 py-3 font-semibold transition-colors hover:bg-[#6a45ff]"
             >
               Browse Games
             </Link>
@@ -228,7 +228,7 @@ export default function CheckoutPage() {
 
             {/* Order Summary */}
 
-            <section className="rounded-xl border border-white/10 bg-[#0d111c] p-6">
+            <section className="rounded-xl border border-white/10 bg-[#13131f] p-6">
               <h2 className="text-xl font-semibold">
                 Order Summary
               </h2>
@@ -245,11 +245,11 @@ export default function CheckoutPage() {
                       </p>
 
                       <p className="mt-1 text-sm text-gray-400">
-                        Console ID: {item.consoleId}
+                        {item.consoleName}
                       </p>
                     </div>
 
-                    <p className="font-semibold text-blue-400">
+                    <p className="font-semibold text-[#34e6c8]">
                       ₹{item.price}
                     </p>
                   </div>
@@ -257,7 +257,7 @@ export default function CheckoutPage() {
               </div>
 
               <div className="mt-6 flex items-center justify-between border-t border-white/10 pt-6">
-                <span className="text-gray-400">
+                <span className="text-[#8a8aa3]">
                   Total
                 </span>
 
@@ -269,12 +269,12 @@ export default function CheckoutPage() {
 
             {/* Payment */}
 
-            <section className="rounded-xl border border-white/10 bg-[#0d111c] p-6">
+            <section className="rounded-xl border border-white/10 bg-[#13131f] p-6">
               <h2 className="text-xl font-semibold">
                 Payment
               </h2>
 
-              <p className="mt-2 text-sm text-gray-400">
+              <p className="mt-2 text-sm text-[#8a8aa3]">
                 Select a mock payment method.
               </p>
 
@@ -309,9 +309,9 @@ export default function CheckoutPage() {
                           | "WALLET"
                       )
                     }
-                    className={`w-full rounded-lg border px-5 py-4 text-left transition ${
+                    className={`w-full cursor-pointer rounded-lg border px-5 py-4 text-left transition-colors ${
                       paymentType === method.value
-                        ? "border-blue-500 bg-blue-500/10"
+                        ? "border-[#7c5cff] bg-[#7c5cff]/10"
                         : "border-white/10 hover:border-white/30"
                     }`}
                   >
@@ -329,14 +329,14 @@ export default function CheckoutPage() {
               <button
                 onClick={handlePlaceOrder}
                 disabled={processing}
-                className="mt-8 w-full rounded-lg bg-blue-600 px-6 py-4 font-semibold hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-8 w-full cursor-pointer rounded-lg bg-[#7c5cff] px-6 py-4 font-semibold transition-colors hover:bg-[#6a45ff] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {processing
                   ? "Processing Mock Payment..."
                   : `Pay ₹${total}`}
               </button>
 
-              <p className="mt-4 text-center text-xs text-gray-500">
+              <p className="mt-4 text-center text-xs text-[#6b6b85]">
                 This is a simulated payment. No real money
                 will be charged.
               </p>
