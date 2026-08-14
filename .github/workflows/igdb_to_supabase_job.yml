@@ -20,7 +20,7 @@ jobs:
         uses: astral-sh/setup-uv@v6
 
       - name: Install dependencies
-        run: uv sync --locked
+        run: uv sync --project gamerzone-de-jobs
 
       - name: Run IGDB to Supabase job
         run: uv run --project gamerzone-de-jobs python gamerzone-de-jobs/igdb_to_supabase_job.py
