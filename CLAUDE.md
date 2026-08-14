@@ -22,6 +22,8 @@ IGDB → Python ingestion (gamerzone-de-jobs) → Supabase PostgreSQL → Next.j
 
 Supabase Auth is the only identity system: `auth.users` ↔ `public.users` (`public.users.user_id → auth.users.id`). Never introduce a second auth system.
 
+**Rendering:** `page.tsx` (home), `games/[id]/page.tsx`, and `deals/page.tsx` are Server Components that query Supabase directly and each set `export const dynamic = "force-dynamic"`. Required because catalogue/price data changes via an external Python job Next.js has no revalidation hook for — without this, Next.js statically caches the page (and the underlying Supabase `fetch()` calls) and serves stale prices/catalogue indefinitely. Any new Server Component reading `games`/`consoles`/`game_prices` needs the same export.
+
 ## 4. Database
 
 - **Catalogue:** `games`, `consoles`, `game_consoles`, `game_prices`
@@ -37,9 +39,17 @@ game_consoles → order_items
 
 `order_items` holds game/console/quantity/unit price. `payments` holds mock method, status, amount, transaction ref.
 
-**Supabase embed convention:** `game_prices` and `order_items` have FKs into `game_consoles` (via `game_id` and `console_id` separately, mirroring `game_consoles`' composite PK) — **not** direct FKs into `games`/`consoles`. Any embedded select off either table must route through `game_consoles` (e.g. `game_prices → game_consoles → games, consoles`), or PostgREST returns `PGRST200`.
+**Supabase embed convention:** `game_prices` and `order_items` have a composite FK into `game_consoles(game_id, console_id)` — **not** direct FKs into `games`/`consoles`. Any embedded select off either table must route through `game_consoles` (e.g. `game_prices → game_consoles → games, consoles`), or PostgREST returns `PGRST200`.
 
 Before any schema change: inspect current schema/FKs, check dependent code, discuss destructive changes first. Be extra careful with `auth.users`, `public.users`, `orders`, `order_items`, `payments`.
+
+**Schema versioning:** the full schema lives in `CLAUDE_CURRENT_DB_STATE.sql` (repo root) — a drop-and-recreate reset script, run manually in the Supabase SQL editor. Not Supabase-CLI-managed migrations (no `supabase/migrations`); this is a plain versioned SQL file, chosen over CLI setup since a full dev reset (not incremental ALTERs) is what's actually needed right now. Update this file whenever the schema changes, so it stays the source of truth.
+
+**`updated_at`:** every table has a `set_updated_at()` trigger (`BEFORE UPDATE`, DB-owned) so `updated_at` is always correct regardless of which process writes the row — the Python ingestion job never sets it manually. This was a real bug (upserts changed `price` but left `updated_at` stale) fixed at the Postgres layer, not in application code.
+
+**FKs:** `game_prices`/`order_items` use a single **composite** FK into `game_consoles(game_id, console_id)` (matches its composite PK) — not two separate single-column FKs, which is invalid since neither column is unique alone on `game_consoles`.
+
+**RLS:** enabled on all 8 tables. Catalogue tables (`games`, `consoles`, `game_consoles`, `game_prices`) are public read-only (ingestion writes via `sb_secret_*` service key, which bypasses RLS). `users`/`orders`/`order_items`/`payments` are scoped to `auth.uid() = user_id` (directly, or via the owning `order` for child tables) — SELECT + INSERT only, no UPDATE/DELETE policies since the app never does either client-side.
 
 ## 5. Purchase Flow
 

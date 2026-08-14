@@ -5,6 +5,9 @@ import HeaderAuth from "@/app/components/HeaderAuth";
 import DealsCatalog, { type Deal } from "@/app/components/DealsCatalog";
 import { supabase } from "@/app/supabase";
 
+// See app/page.tsx — same staleness issue, same fix.
+export const dynamic = "force-dynamic";
+
 type GameData = {
   game_id: number;
   game_name: string;

@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import { supabase } from "@/app/supabase";
 import PurchaseActions from "@/app/components/PurchaseActions";
 
+// See app/page.tsx — same staleness issue, same fix.
+export const dynamic = "force-dynamic";
+
 type ConsoleData = {
   console_name: string | null;
   abbreviation: string | null;

@@ -3,6 +3,11 @@ import HeaderAuth from "@/app/components/HeaderAuth";
 import GameCatalog from "@/app/components/GameCatalog";
 import { supabase } from "@/app/supabase";
 
+// Catalogue/pricing data changes via an external ingestion job that
+// Next.js has no revalidation hook for — force fresh data on every
+// request rather than serving a stale cached build.
+export const dynamic = "force-dynamic";
+
 type Console = {
   console_name: string | null;
   abbreviation: string | null;
