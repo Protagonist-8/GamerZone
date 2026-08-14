@@ -23,7 +23,7 @@ jobs:
         run: uv sync --project gamerzone-de-jobs
 
       - name: Run IGDB to Supabase job
-        run: uv run --project gamerzone-de-jobs python gamerzone-de-jobs/ingestion/igdb_to_supabase_job.py
+        run: uv run --project gamerzone-de-jobs python gamerzone-de-jobs/src/ingestion/igdb_to_supabase_job.py
         env:
           TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
           TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
