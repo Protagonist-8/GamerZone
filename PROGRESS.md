@@ -35,7 +35,7 @@ Authentication relationship: `auth.users` → `public.users` → `orders`, via `
 
 ## Cart
 
-Implemented: Add to Cart, Buy Now, Remove from Cart, Clear Cart, View Cart, cart total, console info per cart item. Managed via React Context (client-side only).
+Implemented: Add to Cart, Buy Now, Remove from Cart, Clear Cart, View Cart, cart total, console info per cart item. Managed via React Context (client-side only). Cart items store both `consoleId` (for order inserts) and `consoleName` (for display) so the UI never shows a raw numeric ID to the user.
 
 ## Checkout
 
@@ -71,8 +71,20 @@ Implemented `app/library/page.tsx`:
 - Keep the application architecture simple; avoid unnecessary services/dependencies.
 - Supabase remains database + auth provider. IGDB remains the catalogue source. GitHub remains source control. Vercel remains frontend deployment.
 
+## UI Redesign & Engagement Pass
+
+Scope: search bar, dead "Deals" link, cursor interactivity, overall visual design/colors, plus a follow-up bug fix.
+
+- **Search bar** made functional: live client-side filter by game name (`app/components/GameCatalog.tsx`), with a distinct "no results for X" state vs. "no games available."
+- **Deals**: new `/deals` page built with a designed "No deals right now" empty state; nav link fixed (was a dead `href="#"`).
+- **Custom interactive cursor**: `app/components/CursorFX.tsx`, a dot+ring cursor that reacts on hover over links/buttons/cards, mounted sitewide via `layout.tsx`. Fine-pointer only, respects `prefers-reduced-motion`. Added explicit `cursor-pointer` to buttons across the app (Tailwind v4 doesn't default this).
+- **Design refresh**: new palette (deep indigo-black + violet primary accent + cyan secondary accent, replacing the generic near-black-plus-blue look) and a Space Grotesk display font, applied consistently across every page and shared component. Fixed the default Next.js page title/description, which had never been customized.
+- **Bug fix (found during this pass):** cart and checkout were displaying the raw `console_id` (e.g. "Console ID: 1") instead of a readable name. Fixed by adding `consoleName` to `CartItem` and passing it through from `PurchaseActions`; see updated Cart section above. DB inserts still correctly use `consoleId`.
+
+See CLAUDE.md Section 6 (Design System) for the established palette/type/cursor conventions going forward.
+
 ## Current Phase: Data Engineering Pipeline (Planned)
 
 Objective: stand up an end-to-end DE project on GamerZone's real transactional data — daily ingestion from Supabase into Snowflake (data lake), then dbt models on top for analysis.
 
-Status: architecture discussion in progress, not yet implemented. See CLAUDE.md Section 17 for what's decided vs. open.
+Status: architecture discussion in progress, not yet implemented. See CLAUDE.md Section 13 for what's decided vs. open.

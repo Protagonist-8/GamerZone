@@ -2,7 +2,7 @@
 
 ## 1. Objective
 
-Gaming e-commerce app: browse games → cart → checkout → mock payment → personal library. Real purpose: generate genuine transactional data through real users (friends), feeding a downstream DE pipeline (Section 12). Do not add synthetic purchase-data generation unless explicitly requested.
+Gaming e-commerce app: browse games → cart → checkout → mock payment → personal library. Real purpose: generate genuine transactional data through real users (friends), feeding a downstream DE pipeline (Section 13). Do not add synthetic purchase-data generation unless explicitly requested.
 
 ## 2. Tech Stack
 
@@ -10,7 +10,7 @@ Gaming e-commerce app: browse games → cart → checkout → mock payment → p
 - **Backend/DB:** Supabase (PostgreSQL + Auth)
 - **Catalogue source:** IGDB API, via Twitch OAuth
 - **Catalogue ingestion:** Python (`gamerzone-de-jobs`)
-- **Planned:** Snowflake (lake/warehouse) + dbt (transforms) — not yet architected, see Section 12
+- **Planned:** Snowflake (lake/warehouse) + dbt (transforms) — not yet architected, see Section 13
 - **Source control:** GitHub
 
 ## 3. Architecture
@@ -31,10 +31,13 @@ Supabase Auth is the only identity system: `auth.users` ↔ `public.users` (`pub
 ```text
 auth.users → public.users → orders → order_items, payments
 games → game_consoles → consoles
-games → game_prices
+game_consoles → game_prices
+game_consoles → order_items
 ```
 
 `order_items` holds game/console/quantity/unit price. `payments` holds mock method, status, amount, transaction ref.
+
+**Supabase embed convention:** `game_prices` and `order_items` have FKs into `game_consoles` (via `game_id` and `console_id` separately, mirroring `game_consoles`' composite PK) — **not** direct FKs into `games`/`consoles`. Any embedded select off either table must route through `game_consoles` (e.g. `game_prices → game_consoles → games, consoles`), or PostgREST returns `PGRST200`.
 
 Before any schema change: inspect current schema/FKs, check dependent code, discuss destructive changes first. Be extra careful with `auth.users`, `public.users`, `orders`, `order_items`, `payments`.
 
@@ -58,27 +61,27 @@ Payment is intentionally mocked (types: `UPI`, `CARD`, `NET_BANKING`, `WALLET`) 
 - Platform scope locked to IGDB platform IDs **6 (PC), 12 (Xbox 360), 41 (Wii U), 48 (PS4), 167 (PS5)** — don't expand without discussion.
 - Preserve existing auth/cart/schema; extend rather than redesign; minimal dependencies.
 
-## 7. Environment Variables
+## 8. Environment Variables
 
 Never hardcode Supabase secrets, API keys, Twitch secrets, or DB credentials. Only expose vars to the browser when intentionally public.
 
-## 8. Deployment
+## 9. Deployment
 
 GitHub → Vercel. Vercel env vars are configured separately from local `.env`. Past incident: misconfigured `SUPABASE_PROJECT_URL` on Vercel → `getaddrinfo ENOTFOUND`. When debugging deploys, check Vercel env vars/values before assuming code is broken.
 
-## 9. Development Style
+## 10. Development Style
 
 Small, focused changes. Reuse existing components. Clear TypeScript types. Straightforward Supabase queries. Explicit error handling. Avoid premature abstraction.
 
-## 10. Documentation
+## 11. Documentation
 
 `CLAUDE.md` = current project knowledge/decisions. `PROGRESS.md` = milestone history. Don't duplicate history into CLAUDE.md; update CLAUDE.md when architecture changes, append PROGRESS.md when a milestone lands.
 
-## 11. Current State
+## 12. Current State
 
-App is fully functional end-to-end: catalogue, auth, cart, checkout, mock payment, and the **Games Library** (`app/library/page.tsx` — purchased games by user, sourced from `order_items`/`orders` filtered on `user_id` + status `CONFIRMED`/`COMPLETED`, joined to `games`/`consoles`; handles signed-out/empty states). No known pending app-layer feature. Active work: the DE pipeline below.
+App is fully functional end-to-end: catalogue, auth, cart, checkout, mock payment, and the **Games Library** (`app/library/page.tsx` — purchased games by user, sourced from `order_items`/`orders` filtered on `user_id` + status `CONFIRMED`/`COMPLETED`, joined to `games`/`consoles`; handles signed-out/empty states). `CartItem` (in `CartContext.tsx`) carries both `consoleId` (for DB inserts) and `consoleName` (for display) — cart/checkout show the human-readable console name, never the raw ID. No known pending app-layer feature. Active work: the DE pipeline below.
 
-## 12. Data Engineering Pipeline (Planned — Not Yet Architected)
+## 13. Data Engineering Pipeline (Planned — Not Yet Architected)
 
 ```text
 Supabase (Postgres, source) → daily ingestion → Snowflake (lake) → dbt models → analytics

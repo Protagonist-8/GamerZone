@@ -1,0 +1,9 @@
+{
+  "platform_price_tiers": {
+    "PlayStation 4": [3499, 1499, 749],
+    "PlayStation 5": [5499, 2499, 1299],
+    "Xbox 360": [4999, 2499, 799],
+    "Wii U": [2499, 1299],
+    "PC (Microsoft Windows)": [999, 499, 299]
+  }
+}

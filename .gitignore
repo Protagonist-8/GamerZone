@@ -11,3 +11,6 @@ wheels/
 
 #Secrets
 gamerzone-de-jobs/.env
+gamerzone-de-jobs/.secrets/
+*.p8
+*.pem

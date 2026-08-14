@@ -1,6 +1,8 @@
+import json
 import os
 import random
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 import requests
@@ -39,13 +41,35 @@ PLATFORM_FAMILIES = {
     167: "PlayStation",
 }
 
-PRICE_OPTIONS = {
-    "PlayStation 4": [3499, 1499, 749],
-    "PlayStation 5": [5499, 2499, 1299],
-    "Xbox 360": [4999, 2499, 799],
-    "Wii U": [2499, 1299],
-    "PC (Microsoft Windows)": [999, 499, 299],
-}
+# Single source of truth for price tiers, shared with the frontend's
+# /deals page. Lives inside gamerzone-frontend so it always deploys
+# with the Vercel app; this job reaches across the repo to read it.
+VARS_JSON_PATH = (
+    Path(__file__).resolve().parents[3]
+    / "gamerzone-frontend"
+    / "config"
+    / "vars.json"
+)
+
+
+def load_price_tiers() -> dict[str, list[int]]:
+
+    if not VARS_JSON_PATH.exists():
+        raise FileNotFoundError(
+            f"vars.json not found at {VARS_JSON_PATH}"
+        )
+
+    with open(VARS_JSON_PATH, encoding="utf-8") as file:
+        data = json.load(file)
+
+    price_tiers = data.get("platform_price_tiers")
+
+    if not price_tiers:
+        raise ValueError(
+            "vars.json is missing 'platform_price_tiers'"
+        )
+
+    return price_tiers
 
 
 # ============================================================
@@ -517,6 +541,8 @@ def upsert_game_prices(
 
     print("\nGenerating game prices...")
 
+    price_tiers = load_price_tiers()
+
     platform_name_by_id = {
         row["source_platform_id"]: row["console_name"]
         for row in console_rows
@@ -538,7 +564,7 @@ def upsert_game_prices(
             source_platform_id
         ]
 
-        price_options = PRICE_OPTIONS.get(
+        price_options = price_tiers.get(
             console_name
         )
 

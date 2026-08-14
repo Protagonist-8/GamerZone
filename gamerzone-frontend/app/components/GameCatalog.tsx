@@ -28,18 +28,48 @@ type Props = {
 
 export default function GameCatalog({ games, priceMap }: Props) {
   const [query, setQuery] = useState("");
+  const [selectedPlatform, setSelectedPlatform] = useState<number | null>(
+    null
+  );
+
+  const platforms = useMemo(() => {
+    const platformMap = new Map<number, string>();
+
+    games.forEach((game) => {
+      game.game_consoles?.forEach((relationship) => {
+        const consoleInfo = relationship.consoles?.[0];
+        const label =
+          consoleInfo?.abbreviation || consoleInfo?.console_name;
+
+        if (label && !platformMap.has(relationship.console_id)) {
+          platformMap.set(relationship.console_id, label);
+        }
+      });
+    });
+
+    return Array.from(platformMap.entries())
+      .map(([consoleId, label]) => ({ consoleId, label }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [games]);
 
   const filteredGames = useMemo(() => {
     const normalized = query.trim().toLowerCase();
 
-    if (!normalized) {
-      return games;
-    }
+    return games.filter((game) => {
+      const matchesQuery =
+        !normalized || game.game_name.toLowerCase().includes(normalized);
 
-    return games.filter((game) =>
-      game.game_name.toLowerCase().includes(normalized)
-    );
-  }, [games, query]);
+      const matchesPlatform =
+        selectedPlatform === null ||
+        game.game_consoles?.some(
+          (relationship) => relationship.console_id === selectedPlatform
+        );
+
+      return matchesQuery && matchesPlatform;
+    });
+  }, [games, query, selectedPlatform]);
+
+  const hasActiveFilters = query.trim() !== "" || selectedPlatform !== null;
 
   return (
     <>
@@ -66,10 +96,39 @@ export default function GameCatalog({ games, priceMap }: Props) {
         </div>
       </div>
 
+      {platforms.length > 1 && (
+        <div className="mt-5 flex flex-wrap gap-2">
+          <button
+            onClick={() => setSelectedPlatform(null)}
+            className={`cursor-pointer rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+              selectedPlatform === null
+                ? "border-[#7c5cff] bg-[#7c5cff] text-white"
+                : "border-white/10 bg-[#161625] text-[#b5b5c9] hover:border-[#7c5cff]/40 hover:text-white"
+            }`}
+          >
+            All Platforms
+          </button>
+
+          {platforms.map((platform) => (
+            <button
+              key={platform.consoleId}
+              onClick={() => setSelectedPlatform(platform.consoleId)}
+              className={`cursor-pointer rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+                selectedPlatform === platform.consoleId
+                  ? "border-[#7c5cff] bg-[#7c5cff] text-white"
+                  : "border-white/10 bg-[#161625] text-[#b5b5c9] hover:border-[#7c5cff]/40 hover:text-white"
+              }`}
+            >
+              {platform.label}
+            </button>
+          ))}
+        </div>
+      )}
+
       <section className="mx-auto max-w-7xl pb-16 pt-12">
         <div className="mb-6 flex items-center justify-between">
           <h3 className="font-[family-name:var(--font-display)] text-2xl font-semibold">
-            {query ? "Search Results" : "Popular Games"}
+            {hasActiveFilters ? "Search Results" : "Popular Games"}
           </h3>
 
           <span className="text-sm text-[#8a8aa3]">
@@ -83,20 +142,25 @@ export default function GameCatalog({ games, priceMap }: Props) {
         ) : filteredGames.length === 0 ? (
           <div className="rounded-xl border border-white/10 bg-[#13131f] p-10 text-center">
             <p className="text-[#8a8aa3]">
-              No games match &ldquo;{query}&rdquo;.
+              {query
+                ? `No games match "${query}".`
+                : "No games for this platform."}
             </p>
 
             <button
-              onClick={() => setQuery("")}
+              onClick={() => {
+                setQuery("");
+                setSelectedPlatform(null);
+              }}
               className="mt-4 cursor-pointer text-sm text-[#9b8cff] hover:text-[#c4b5ff]"
             >
-              Clear search
+              Clear filters
             </button>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
             {filteredGames.map((game) => {
-              const platforms =
+              const platformLabels =
                 game.game_consoles
                   ?.map((relationship) => {
                     const consoleInfo = relationship.consoles?.[0];
@@ -122,6 +186,14 @@ export default function GameCatalog({ games, priceMap }: Props) {
                 pricesForGame.length > 0
                   ? Math.min(...pricesForGame)
                   : null;
+
+              const platformPrice =
+                selectedPlatform !== null
+                  ? priceMap[`${game.game_id}-${selectedPlatform}`]
+                  : undefined;
+
+              const displayPrice =
+                platformPrice !== undefined ? platformPrice : lowestPrice;
 
               return (
                 <Link
@@ -150,12 +222,12 @@ export default function GameCatalog({ games, priceMap }: Props) {
 
                     <p className="mt-1 text-xs text-[#8a8aa3]">
                       {game.release_year ?? "Unknown"} •{" "}
-                      {platforms.join(", ")}
+                      {platformLabels.join(", ")}
                     </p>
 
-                    {lowestPrice !== null ? (
+                    {displayPrice !== null ? (
                       <p className="mt-3 font-semibold text-[#34e6c8]">
-                        From ₹{lowestPrice}
+                        ₹{displayPrice}
                       </p>
                     ) : (
                       <p className="mt-3 text-sm text-[#6b6b85]">
