@@ -88,3 +88,22 @@ See CLAUDE.md Section 6 (Design System) for the established palette/type/cursor 
 Objective: stand up an end-to-end DE project on GamerZone's real transactional data — daily ingestion from Supabase into Snowflake (data lake), then dbt models on top for analysis.
 
 Status: architecture discussion in progress, not yet implemented. See CLAUDE.md Section 13 for what's decided vs. open.
+
+## Source-System Readiness Pass
+
+Context: before building the Supabase → Snowflake extraction, did a correctness pass on the source system itself, since the DE pipeline's incremental-extraction plan and dbt snapshotting depend on it being trustworthy.
+
+- **Found and fixed an `updated_at` bug:** the IGDB ingestion job's `game_prices` upsert changed `price` on every run, but `updated_at` never moved — Postgres `DEFAULT now()` only fires on INSERT, not UPDATE, and no trigger existed to handle the update case. Root-caused to the database layer (not the Python job) and fixed there, since the app/ingestion code should never need to manage its own audit timestamps.
+- **Found and fixed an invalid FK design:** `game_prices`/`order_items` each had two single-column FKs into `game_consoles(game_id)`/`game_consoles(console_id)` separately — invalid, since neither column is unique alone on that table (its PK is the composite pair). Replaced with a single composite FK.
+- **Established version-controlled schema:** `CLAUDE_CURRENT_DB_STATE.sql` (repo root) is now the schema source of truth — a full drop-and-recreate script (not Supabase-CLI migrations; a plain versioned SQL file was the right fit for a full dev reset). Includes a generic `set_updated_at()` trigger attached to all 8 tables, and FK-column indexes that were missing (`orders.user_id`, `order_items.order_id`, `game_consoles.console_id`).
+- **Enabled Row Level Security** on all 8 tables: catalogue tables (`games`/`consoles`/`game_consoles`/`game_prices`) are public read-only (ingestion writes via the service-role key, which bypasses RLS); `users`/`orders`/`order_items`/`payments` are scoped to the owning `auth.uid()`, SELECT + INSERT only.
+- **Ran the full reset** (including wiping `auth.users`, since this is a dev environment and friends re-signing up was acceptable) and re-verified checkout/RLS/library end-to-end.
+- **Found and fixed a frontend staleness bug** surfaced while verifying: `page.tsx` (home), `games/[id]/page.tsx`, and `deals/page.tsx` are Server Components with no cache config, so Next.js statically cached their Supabase `fetch()` calls indefinitely — prices/catalogue shown in the UI didn't reflect the DB after the ingestion job ran again. Fixed by adding `export const dynamic = "force-dynamic"` to all three, since there's no revalidation hook from the external Python job to do this more surgically.
+
+All of the above verified working end-to-end (checkout, RLS, and price freshness in the UI all confirmed against the live DB after a fresh reset + two ingestion runs).
+
+## Auth Modal Polish
+
+- Sign Up now shows a Retype Password field (client-side match check before submit) that Sign In doesn't.
+- Signup auto-logs the user in (closes modal, reloads) instead of bouncing back to Sign In — relies on Supabase returning a session directly, which requires "Confirm email" off in Supabase Auth settings (confirmed off for this project).
+- Signing up with an existing email now detects it (via error message or Supabase's empty-`identities` signal, used when confirmations are on) and redirects to Sign In with a clear message, instead of silently failing or looking like success.

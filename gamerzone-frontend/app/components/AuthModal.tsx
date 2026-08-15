@@ -11,14 +11,28 @@ export default function AuthModal({ onClose }: AuthModalProps) {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  function switchMode(next: "signin" | "signup") {
+    setMode(next);
+    setMessage("");
+    setPassword("");
+    setConfirmPassword("");
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    setLoading(true);
     setMessage("");
+
+    if (mode === "signup" && password !== confirmPassword) {
+      setMessage("Passwords do not match.");
+      return;
+    }
+
+    setLoading(true);
 
     if (mode === "signin") {
       const { error } = await supabase.auth.signInWithPassword({
@@ -33,16 +47,39 @@ export default function AuthModal({ onClose }: AuthModalProps) {
         window.location.reload();
       }
     } else {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
       });
 
-      if (error) {
+      // Supabase intentionally does not return a normal error for a
+      // duplicate email when "Confirm email" is enabled (anti-enumeration
+      // protection) — instead it returns a success-shaped response with an
+      // empty `identities` array. Check both signals.
+      const looksLikeExistingUser =
+        (error && /already registered|already exists/i.test(error.message)) ||
+        (!error && data.user && data.user.identities?.length === 0);
+
+      if (looksLikeExistingUser) {
+        setMode("signin");
+        setPassword("");
+        setConfirmPassword("");
+        setMessage("An account with this email already exists. Please sign in.");
+      } else if (error) {
         setMessage(error.message);
+      } else if (data.session) {
+        // Email confirmation is off — Supabase returned a session, so the
+        // new user is already authenticated. Behave exactly like sign-in.
+        onClose();
+        window.location.reload();
       } else {
+        // New account created, but email confirmation is required before a
+        // session can be issued — true auto-login isn't possible here.
+        setMode("signin");
+        setPassword("");
+        setConfirmPassword("");
         setMessage(
-          "Account created. Please check your email if confirmation is required."
+          "Account created. Please check your email to confirm your account, then sign in."
         );
       }
     }
@@ -104,6 +141,24 @@ export default function AuthModal({ onClose }: AuthModalProps) {
             />
           </div>
 
+          {mode === "signup" && (
+            <div>
+              <label className="mb-2 block text-sm text-[#b5b5c9]">
+                Retype Password
+              </label>
+
+              <input
+                type="password"
+                required
+                minLength={6}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full rounded-lg border border-white/10 bg-[#161625] px-4 py-3 outline-none transition-colors focus:border-[#7c5cff]"
+                placeholder="••••••••"
+              />
+            </div>
+          )}
+
           {message && (
             <p className="text-sm text-[#b5b5c9]">{message}</p>
           )}
@@ -126,10 +181,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
             <>
               Don&apos;t have an account?{" "}
               <button
-                onClick={() => {
-                  setMode("signup");
-                  setMessage("");
-                }}
+                onClick={() => switchMode("signup")}
                 className="cursor-pointer text-[#9b8cff] hover:text-[#c4b5ff]"
               >
                 Sign Up
@@ -139,10 +191,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
             <>
               Already have an account?{" "}
               <button
-                onClick={() => {
-                  setMode("signin");
-                  setMessage("");
-                }}
+                onClick={() => switchMode("signin")}
                 className="cursor-pointer text-[#9b8cff] hover:text-[#c4b5ff]"
               >
                 Sign In

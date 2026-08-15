@@ -89,7 +89,9 @@ Small, focused changes. Reuse existing components. Clear TypeScript types. Strai
 
 ## 12. Current State
 
-App is fully functional end-to-end: catalogue, auth, cart, checkout, mock payment, and the **Games Library** (`app/library/page.tsx` — purchased games by user, sourced from `order_items`/`orders` filtered on `user_id` + status `CONFIRMED`/`COMPLETED`, joined to `games`/`consoles`; handles signed-out/empty states). `CartItem` (in `CartContext.tsx`) carries both `consoleId` (for DB inserts) and `consoleName` (for display) — cart/checkout show the human-readable console name, never the raw ID. No known pending app-layer feature. Active work: the DE pipeline below.
+App is fully functional end-to-end: catalogue, auth, cart, checkout, mock payment, and the **Games Library** (`app/library/page.tsx` — purchased games by user, sourced from `order_items`/`orders` filtered on `user_id` + status `CONFIRMED`/`COMPLETED`, joined to `games`/`consoles`; handles signed-out/empty states). `CartItem` (in `CartContext.tsx`) carries both `consoleId` (for DB inserts) and `consoleName` (for display) — cart/checkout show the human-readable console name, never the raw ID. No known pending app-layer feature.
+
+Source system (Supabase) is now production-shaped: version-controlled schema, correct `updated_at` semantics, RLS enforced, and the frontend confirmed to reflect DB state accurately (see Section 4 and Section 3's Rendering note). This closes out the app-layer/source-layer readiness work. Active work: the DE pipeline below — the next concrete step is Snowflake + dbt, not yet started.
 
 ## 13. Data Engineering Pipeline (Planned — Not Yet Architected)
 
@@ -115,4 +117,4 @@ Supabase (Postgres, source) → daily ingestion → Snowflake (lake) → dbt mod
 - dbt project structure (staging/intermediate/marts layout, naming conventions).
 - Exact dim/fact model design (grain of `fact_orders` vs `fact_order_items`, which dims are needed).
 
-Implementation not yet started — paused in favor of frontend UI work (see PROGRESS.md).
+Implementation not yet started. Source-side prerequisites (schema versioning, `updated_at` correctness, RLS, frontend caching correctness) are done — see Section 12. Next concrete step: resolve the three open items above (Snowflake naming/setup, dbt project structure, dim/fact design), then implement extraction. See PROGRESS.md for what's landed so far.
