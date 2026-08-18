@@ -1,7 +1,9 @@
 name: IGDB to Supabase
 
 on:
-  workflow_dispatch:
+  schedule:
+    # 8:00 AM IST (02:30 UTC)
+    - cron: "30 1 * * *"
 
 jobs:
   run-igdb-job:
