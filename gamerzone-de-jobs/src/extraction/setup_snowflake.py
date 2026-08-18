@@ -6,7 +6,7 @@ Run this once before the recurring batch job (supabase_to_snowflake_job.py).
 Safe to re-run — every statement is IF NOT EXISTS.
 """
 
-from extraction.snowflake_conn import (
+from snowflake_conn import (
     SNOWFLAKE_DATABASE,
     SNOWFLAKE_SCHEMA,
     SNOWFLAKE_WAREHOUSE,
