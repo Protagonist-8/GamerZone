@@ -1,0 +1,40 @@
+name: Supabase to Snowflake - Dimensions
+
+on:
+  schedule:
+    # 8:00 AM IST (02:30 UTC)
+    - cron: "30 2 * * *"
+
+    # 8:00 PM IST (14:30 UTC)
+    - cron: "30 14 * * *"
+
+  workflow_dispatch:
+
+jobs:
+  dimensions:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Set up Python
+        run: uv python install 3.11
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run dimension ingestion
+        env:
+          SUPABASE_PROJECT_URL: ${{ secrets.SUPABASE_PROJECT_URL }}
+          SUPABASE_API_KEY: ${{ secrets.SUPABASE_API_KEY }}
+
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+          SNOWFLAKE_PAT: ${{ secrets.SNOWFLAKE_PAT }}
+        run: |
+          uv run python gamerzone-de-jobs/supabase_to_snowflake_dimensions.py
