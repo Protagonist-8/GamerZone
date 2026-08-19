@@ -34,4 +34,4 @@ jobs:
           SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
           SNOWFLAKE_PAT: ${{ secrets.SNOWFLAKE_PAT }}
         run: |
-          uv run python gamerzone-de-jobs/src/extraction/supabase_to_snowflake_facts.py
+          uv run --project gamerzone-de-jobs python gamerzone-de-jobs/src/extraction/supabase_to_snowflake_facts_job.py
